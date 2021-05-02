@@ -263,7 +263,7 @@ internal object Devirtualization {
                 vtable[callSite.calleeVtableIndex]
 
             is DataFlowIR.Node.ItableCall ->
-                itable[callSite.calleeHash]!!
+                itable[callSite.interfaceId]!![callSite.calleeItableIndex]
 
             else -> error("Unreachable")
         }

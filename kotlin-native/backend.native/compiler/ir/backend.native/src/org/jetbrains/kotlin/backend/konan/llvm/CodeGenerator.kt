@@ -965,8 +965,8 @@ internal class FunctionGenerationContext(val function: LLVMValueRef,
     }
 
     fun lookupInterfaceTableRecord(typeInfo: LLVMValueRef, interfaceId: Int): LLVMValueRef {
-        val interfaceTableSize = load(structGep(typeInfo, 11 /* interfaceTableSize_ */))
-        val interfaceTable = load(structGep(typeInfo, 12 /* interfaceTable_ */))
+        val interfaceTableSize = load(structGep(typeInfo, 9 /* interfaceTableSize_ */))
+        val interfaceTable = load(structGep(typeInfo, 10 /* interfaceTable_ */))
 
         fun fastPath(): LLVMValueRef {
             // The fastest optimistic version.
@@ -975,7 +975,8 @@ internal class FunctionGenerationContext(val function: LLVMValueRef,
         }
 
         // See details in ClassLayoutBuilder.
-        return if (context.globalHierarchyAnalysisResult.bitsPerColor <= ClassGlobalHierarchyInfo.MAX_BITS_PER_COLOR
+        return if (context.ghaEnabled()
+                && context.globalHierarchyAnalysisResult.bitsPerColor <= ClassGlobalHierarchyInfo.MAX_BITS_PER_COLOR
                 && context.config.produce != CompilerOutputKind.FRAMEWORK) {
             // All interface tables are small and no unknown interface inheritance.
             fastPath()
@@ -1020,7 +1021,6 @@ internal class FunctionGenerationContext(val function: LLVMValueRef,
          */
         val anyMethod = (irFunction as IrSimpleFunction).findOverriddenMethodOfAny()
         val owner = (anyMethod ?: irFunction).parentAsClass
-        val methodHash = codegen.functionHash(irFunction)
 
         val llvmMethod = when {
             !owner.isInterface -> {
@@ -1031,8 +1031,6 @@ internal class FunctionGenerationContext(val function: LLVMValueRef,
                 val slot = gep(vtable, Int32(index).llvm)
                 load(slot)
             }
-
-            !context.ghaEnabled() -> call(context.llvm.lookupOpenMethodFunction, listOf(typeInfoPtr, methodHash))
 
             else -> {
                 // Essentially: typeInfo.itable[place(interfaceId)].vtable[method]
