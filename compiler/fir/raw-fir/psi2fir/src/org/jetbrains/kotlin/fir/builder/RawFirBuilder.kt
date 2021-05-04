@@ -154,12 +154,20 @@ open class RawFirBuilder(
             }
         }
 
-    protected inner class Visitor : KtVisitor<FirElement, Unit>() {
+    protected open inner class Visitor : KtVisitor<FirElement, Unit>() {
         private inline fun <reified R : FirElement> KtElement?.convertSafe(): R? =
-            this?.accept(this@Visitor, Unit) as? R
+            this?.let(::convertElement) as? R
 
         private inline fun <reified R : FirElement> KtElement.convert(): R =
-            this.accept(this@Visitor, Unit) as R
+            convertElement(this) as R
+
+        open fun convertElement(element: KtElement): FirElement? =
+            element.accept(this@Visitor, Unit)
+
+        open fun convertProperty(
+            property: KtProperty, ownerRegularOrAnonymousObjectSymbol: FirClassSymbol<*>?,
+            ownerRegularClassTypeParametersCount: Int?,
+        ): FirProperty = property.toFirProperty(ownerRegularOrAnonymousObjectSymbol, ownerRegularClassTypeParametersCount)
 
         private fun KtTypeReference?.toFirOrImplicitType(): FirTypeRef =
             convertSafe() ?: buildImplicitTypeRef {
@@ -230,7 +238,11 @@ open class RawFirBuilder(
                     }
                 }
                 is KtProperty -> {
-                    toFirProperty(ownerClassBuilder)
+                    convertProperty(
+                        this@toFirDeclaration,
+                        ownerClassBuilder.ownerRegularOrAnonymousObjectSymbol,
+                        ownerClassBuilder.ownerRegularClassTypeParametersCount
+                    )
                 }
                 else -> convert()
             }
@@ -1238,7 +1250,10 @@ open class RawFirBuilder(
             }
         }
 
-        fun KtProperty.toFirProperty(ownerClassBuilder: FirClassBuilder?): FirProperty {
+        private fun KtProperty.toFirProperty(
+            ownerRegularOrAnonymousObjectSymbol: FirClassSymbol<*>?,
+            ownerRegularClassTypeParametersCount: Int?,
+        ): FirProperty {
             val propertyType = typeReference.toFirOrImplicitType()
             val propertyName = nameAsSafeName
             val isVar = isVar
@@ -1279,7 +1294,15 @@ open class RawFirBuilder(
                     }
 
                     val receiver = delegateExpression?.toFirExpression("Incorrect delegate expression")
-                    generateAccessorsByDelegate(delegateBuilder, null, baseSession, isExtension = false, stubMode, receiver)
+                    generateAccessorsByDelegate(
+                        delegateBuilder,
+                        ownerRegularOrAnonymousObjectSymbol = null,
+                        ownerRegularClassTypeParametersCount = null,
+                        session = baseSession,
+                        isExtension = false,
+                        stubMode = stubMode,
+                        receiver = receiver
+                    )
                 } else {
                     isLocal = false
                     receiverTypeRef = receiverTypeReference.convertSafe()
@@ -1322,7 +1345,8 @@ open class RawFirBuilder(
                         val receiver = delegateExpression?.toFirExpression("Should have delegate")
                         generateAccessorsByDelegate(
                             delegateBuilder,
-                            ownerClassBuilder,
+                            ownerRegularOrAnonymousObjectSymbol,
+                            ownerRegularClassTypeParametersCount,
                             baseSession,
                             isExtension = receiverTypeReference != null,
                             stubMode,
@@ -1348,7 +1372,7 @@ open class RawFirBuilder(
         }
 
         override fun visitProperty(property: KtProperty, data: Unit): FirElement {
-            return property.toFirProperty(ownerClassBuilder = null)
+            return property.toFirProperty(ownerRegularOrAnonymousObjectSymbol = null, ownerRegularClassTypeParametersCount = null)
         }
 
         override fun visitTypeReference(typeReference: KtTypeReference, data: Unit): FirElement {
