@@ -197,10 +197,10 @@ class IrIntrinsicMethods(val irBuiltIns: IrBuiltIns, val symbols: JvmSymbols) {
         } + numberConversionMethods(irBuiltIns.numberClass)
 
     private fun arrayMethods(): List<Pair<Key, IntrinsicMethod>> =
-        symbols.primitiveArrays.flatMap { (key, value) ->
+        symbols.primitiveArraysToPrimitiveTypes.flatMap { (arraySymbol, primitiveType) ->
             arrayMethods(
-                key.symbol,
-                value
+                primitiveType.symbol,
+                arraySymbol
             )
         } + arrayMethods(symbols.array.owner.typeParameters.single().symbol, symbols.array)
 
