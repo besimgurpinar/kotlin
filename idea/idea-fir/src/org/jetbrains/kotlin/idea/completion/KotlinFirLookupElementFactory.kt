@@ -16,9 +16,11 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiUtil
 import org.jetbrains.kotlin.idea.core.asFqNameWithRootPrefixIfNeeded
 import org.jetbrains.kotlin.idea.frontend.api.KtAnalysisSession
 import org.jetbrains.kotlin.idea.frontend.api.analyse
+import org.jetbrains.kotlin.idea.frontend.api.analyseInDependedAnalysisSession
 import org.jetbrains.kotlin.idea.frontend.api.fir.utils.addImportToFile
 import org.jetbrains.kotlin.idea.frontend.api.symbols.*
 import org.jetbrains.kotlin.idea.frontend.api.symbols.markers.KtNamedSymbol
@@ -27,6 +29,7 @@ import org.jetbrains.kotlin.idea.frontend.api.tokens.hackyAllowRunningOnEdt
 import org.jetbrains.kotlin.idea.frontend.api.types.KtFunctionalType
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.*
+import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtTypeArgumentList
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
@@ -416,7 +419,6 @@ private fun shortenReferences(targetFile: KtFile, textRange: TextRange) {
             collectPossibleReferenceShortenings(targetFile, textRange)
         }
     }
-
     shortenings.invokeShortening()
 }
 
