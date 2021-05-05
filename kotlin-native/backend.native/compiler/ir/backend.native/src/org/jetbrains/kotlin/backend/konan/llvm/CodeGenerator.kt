@@ -1271,13 +1271,6 @@ internal class FunctionGenerationContext(val function: LLVMValueRef,
             returnSlot = LLVMGetParam(function, numParameters(function.type) - 1)
         }
 
-        if (context.memoryModel == MemoryModel.EXPERIMENTAL &&
-                irFunction?.origin == CBridgeOrigin.C_TO_KOTLIN_BRIDGE) {
-            check(!forbidRuntime) { "Attempt to switch the thread state when runtime is forbidden" }
-            positionAtEnd(prologueBb)
-            switchThreadState(Runnable)
-        }
-
         positionAtEnd(localsInitBb)
         slotsPhi = phi(kObjHeaderPtrPtr)
         // Is removed by DCE trivially, if not needed.
@@ -1288,7 +1281,14 @@ internal class FunctionGenerationContext(val function: LLVMValueRef,
 
     internal fun epilogue() {
         appendingTo(prologueBb) {
-            if (needsRuntimeInit) {
+            if (context.memoryModel == MemoryModel.EXPERIMENTAL &&
+                    irFunction?.origin == CBridgeOrigin.C_TO_KOTLIN_BRIDGE) {
+                check(!forbidRuntime) { "Attempt to switch the thread state when runtime is forbidden" }
+                // TODO: That's an odd one. If runtime is going to be initialized here, state switch below is going to
+                //       fail because of Runnable->Runnable.
+                call(context.llvm.initRuntimeIfNeeded, emptyList())
+                switchThreadState(Runnable)
+            } else if (needsRuntimeInit) {
                 check(!forbidRuntime) { "Attempt to init runtime where runtime usage is forbidden" }
                 call(context.llvm.initRuntimeIfNeeded, emptyList())
             }
