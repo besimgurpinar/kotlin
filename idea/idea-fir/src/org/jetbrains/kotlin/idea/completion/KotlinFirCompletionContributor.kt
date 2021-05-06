@@ -32,7 +32,6 @@ import org.jetbrains.kotlin.idea.frontend.api.symbols.markers.isExtension
 import org.jetbrains.kotlin.idea.frontend.api.types.KtClassType
 import org.jetbrains.kotlin.idea.frontend.api.types.KtType
 import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.psi.*
 
 class KotlinFirCompletionContributor : CompletionContributor() {
@@ -59,7 +58,7 @@ private object KotlinFirCompletionProvider : CompletionProvider<CompletionParame
 
         if (positionContext is FirUnknownPositionContext) {
             // TODO unify when LL API will be able to handle more context for completion
-            keywordContributor.completeKeywordsWithoutAnalysisSessionContext(positionContext.position, expression = null)
+            keywordContributor.completeDefaultKeywordsWithoutResolve(positionContext.position, expression = null)
         } else {
             FirPositionCompletionContextDetector.analyseInContext(basicContext, positionContext) {
                 with(keywordContributor) { completeKeywords(positionContext) }
