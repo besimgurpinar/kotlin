@@ -1080,6 +1080,9 @@ fun main(args: Array<String>) {
             testClass<AbstractFirSealedInheritorsTest> {
                 model("resolveSealed", recursive = false, extension = null)
             }
+            testClass<AbstractFirOnAirResolveTest> {
+                model("onAirResolve")
+            }
             testClass<AbstractFirLazyDeclarationResolveTest> {
                 model("lazyResolve")
             }
