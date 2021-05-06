@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.descriptors.NotFoundClasses
 import org.jetbrains.kotlin.ir.IrBuiltIns
 import org.jetbrains.kotlin.ir.builders.IrGeneratorContext
+import org.jetbrains.kotlin.ir.descriptors.IrBuiltInsOverDescriptors
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.util.ConstantValueGenerator
 import org.jetbrains.kotlin.ir.util.SymbolTable
@@ -39,4 +40,6 @@ class GeneratorContext(
     fun IrDeclarationReference.commitSubstituted(descriptor: CallableDescriptor) {
         callToSubstitutedDescriptorMap[this] = descriptor
     }
+
+    val irBuiltInsOverDescriptors: IrBuiltInsOverDescriptors get() = irBuiltIns as IrBuiltInsOverDescriptors
 }
