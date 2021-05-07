@@ -6,7 +6,7 @@
 
     <!--  Supported Intentions -->
     <intentionAction>
-      <className>org.jetbrains.kotlin.idea.intentions.ImportMemberIntention</className>
+      <className>org.jetbrains.kotlin.idea.intentions.conventionNameCalls.ReplaceContainsIntention</className>
       <category>Kotlin</category>
     </intentionAction>
 
