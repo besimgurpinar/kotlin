@@ -5,15 +5,15 @@
 
 package org.jetbrains.kotlin.gradle
 
+import org.jetbrains.kotlin.gradle.util.AGPVersion
 import org.jetbrains.kotlin.konan.target.HostManager
+import org.jetbrains.kotlin.test.util.KtTestUtil
 import org.junit.Assume
 import org.junit.BeforeClass
 import kotlin.test.Test
 
-class AppleFrameworkIT : KotlinAndroid36GradleIT() {
+class AppleFrameworkIT : BaseGradleIT() {
     companion object {
-        private val gradleVersion = GradleVersionRequired.FOR_MPP_SUPPORT
-
         @BeforeClass
         @JvmStatic
         fun assumeItsMac() {
@@ -21,8 +21,11 @@ class AppleFrameworkIT : KotlinAndroid36GradleIT() {
         }
     }
 
-    override val defaultGradleVersion: GradleVersionRequired
-        get() = gradleVersion
+    override val defaultGradleVersion = GradleVersionRequired.FOR_MPP_SUPPORT
+    override fun defaultBuildOptions() = super.defaultBuildOptions().copy(
+        androidHome = KtTestUtil.findAndroidSdk(),
+        androidGradlePluginVersion = AGPVersion.v3_6_0
+    )
 
     @Test
     fun `assemble debug AppleFrameworkForXcode for IosArm64`() {
