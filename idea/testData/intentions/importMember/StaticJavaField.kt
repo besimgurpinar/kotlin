@@ -1,5 +1,7 @@
 // INTENTION_TEXT: "Add import for 'java.util.regex.Pattern.CASE_INSENSITIVE'"
 // WITH_RUNTIME
+// IGNORE_FIR
+
 
 import java.util.regex.Pattern
 

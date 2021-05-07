@@ -3,6 +3,8 @@
 // ERROR: Unresolved reference: SomethingElse
 // ERROR: Unresolved reference: somethingElse
 // SKIP_ERRORS_AFTER
+// IGNORE_FIR
+
 
 import java.util.regex.Pattern
 

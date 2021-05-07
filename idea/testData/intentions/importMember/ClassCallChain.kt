@@ -1,4 +1,5 @@
 // INTENTION_TEXT: "Add import for 'pack.name.Fixtures'"
+// IGNORE_FIR
 
 package pack.name
 

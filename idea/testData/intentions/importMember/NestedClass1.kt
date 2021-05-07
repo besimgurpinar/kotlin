@@ -1,5 +1,7 @@
 // INTENTION_TEXT: "Add import for 'ppp.Foo.Bar'"
 // WITH_RUNTIME
+// IGNORE_FIR
+
 package ppp
 
 sealed class Foo {

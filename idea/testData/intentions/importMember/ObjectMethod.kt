@@ -1,5 +1,6 @@
 // INTENTION_TEXT: "Add import for 'kotlin.properties.Delegates.notNull'"
 // WITH_RUNTIME
+// IGNORE_FIR
 
 import kotlin.properties.Delegates
 
