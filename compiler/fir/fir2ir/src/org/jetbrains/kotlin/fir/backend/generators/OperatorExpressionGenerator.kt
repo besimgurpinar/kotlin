@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.fir.backend.generators
 
 import org.jetbrains.kotlin.fir.backend.*
 import org.jetbrains.kotlin.fir.expressions.*
+import org.jetbrains.kotlin.fir.isPrimitiveNumberType
 import org.jetbrains.kotlin.fir.types.ConeClassLikeType
 import org.jetbrains.kotlin.fir.types.isNullable
 import org.jetbrains.kotlin.ir.builders.primitiveOp1
@@ -56,6 +57,11 @@ internal class OperatorExpressionGenerator(
                 comparisonExpression.compareToCall.accept(visitor, null) as IrExpression,
                 IrConstImpl.int(startOffset, endOffset, irBuiltIns.intType, 0)
             )
+        }
+
+        if (comparisonExpression.compareToCall.toResolvedCallableSymbol()?.callableId?.classId?.isPrimitiveNumberType() != true) {
+            //real call doesn't lead to function in primitive we shouldn't try replace with default primitive comparison
+            return fallbackToRealCall()
         }
 
         val comparisonInfo = comparisonExpression.inferPrimitiveNumericComparisonInfo() ?: return fallbackToRealCall()

@@ -57,6 +57,8 @@ fun FirClass<*>.isPrimitiveNumberType(): Boolean = classId in PRIMITIVE_NUMBER_C
 fun FirClass<*>.isPrimitiveUnsignedNumberType(): Boolean = classId in PRIMITIVE_UNSIGNED_NUMBER_CLASS_IDS
 fun FirClass<*>.isPrimitiveNumberOrUnsignedNumberType(): Boolean = isPrimitiveNumberType() || isPrimitiveUnsignedNumberType()
 
+fun ClassId.isPrimitiveNumberType(): Boolean = this in PRIMITIVE_NUMBER_CLASS_IDS
+
 private val PRIMITIVE_NUMBER_CLASS_IDS: Set<ClassId> = setOf(
     StandardClassIds.Double, StandardClassIds.Float, StandardClassIds.Long, StandardClassIds.Int,
     StandardClassIds.Short, StandardClassIds.Byte
